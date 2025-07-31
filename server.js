@@ -19,10 +19,8 @@ const authRoutes = require('./routes/authRoutes');
 const courseDetailsRoutes = require('./routes/courseDetailsRoutes');
 const quizRoutes = require('./routes/quizRoutes'); 
 const quizScoreRoutes = require('./routes/quizScoreRoutes');
-const profileRoutes = require('./routes/profileRoutes')
+const profileRoutes = require('./routes/profileRoutes');
 const syllabusRoutes = require('./routes/syllabusRoutes');
-
-
 
 // Use Routes
 app.use('/api/courses', courseRoutes);
@@ -34,16 +32,28 @@ app.use('/api/quizscore', quizScoreRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/syllabus', syllabusRoutes);
 
+// Get the MongoDB URI from environment variables
+const MONGO_URI = process.env.MONGO_URI;
 
-
-
+// Check if URI is undefined and give a useful error message
+if (!MONGO_URI) {
+  console.error("❌ MONGO_URI is not defined in your environment variables.");
+  process.exit(1); // Stop the server from starting
+}
 
 // Connect MongoDB and Start Server
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
-    app.listen(5000, () => {
-      console.log("Server running on port 5000");
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`✅ MongoDB connected\n🚀 Server running on port ${PORT}`);
     });
   })
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    console.error("❌ Failed to connect to MongoDB:", err.message);
+    process.exit(1);
+  });
