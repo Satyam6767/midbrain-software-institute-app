@@ -21,6 +21,9 @@ const quizRoutes = require('./routes/quizRoutes');
 const quizScoreRoutes = require('./routes/quizScoreRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const syllabusRoutes = require('./routes/syllabusRoutes');
+const interviewQsRoutes = require('./routes/interviewQuestions');
+
+
 
 // Use Routes
 app.use('/api/courses', courseRoutes);
@@ -31,6 +34,7 @@ app.use('/api/quiz', quizRoutes);
 app.use('/api/quizscore', quizScoreRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/syllabus', syllabusRoutes);
+app.use('/api/interview-questions', interviewQsRoutes);
 
 // Get the MongoDB URI from environment variables
 const MONGO_URI = process.env.MONGO_URI;

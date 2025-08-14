@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const InterviewQuestion = require('../models/InterviewQuestion');
 
 // =====================
@@ -13,12 +14,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Please provide course, question, and answer' });
     }
 
-    const newQuestion = new InterviewQuestion({
-      course,
-      question,
-      answer
-    });
-
+    const newQuestion = new InterviewQuestion({ course, question, answer });
     await newQuestion.save();
     res.status(201).json(newQuestion);
   } catch (error) {
@@ -34,13 +30,18 @@ router.get('/:courseId', async (req, res) => {
   try {
     const { courseId } = req.params;
 
-    const questions = await InterviewQuestion.find({ course: courseId });
-
-    if (!questions.length) {
-      return res.status(404).json({ message: 'No interview questions found for this course.' });
+    // Convert courseId to ObjectId to match database
+    let courseObjectId;
+    try {
+      courseObjectId = mongoose.Types.ObjectId(courseId);
+    } catch {
+      return res.status(400).json({ message: 'Invalid course ID' });
     }
 
-    res.json(questions);
+    const questions = await InterviewQuestion.find({ course: courseObjectId });
+
+    // Always return an array, even if empty
+    return res.json(questions);
   } catch (error) {
     console.error('Error fetching interview questions:', error);
     res.status(500).json({ message: 'Server error fetching interview questions' });
